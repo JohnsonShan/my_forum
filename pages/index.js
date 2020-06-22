@@ -25,7 +25,9 @@ export default function Home(props) {
       comments: [],
       // owner: 'Anonymous',
     };
-    const res = await fetch("http://127.0.0.1:8000/posts/", {
+    const res = await fetch("http://34.69.148.251/posts/", {
+      // const res = await fetch("http://localhost:8000/posts/", {
+
       method: "post",
       // id Anonymous, pw guestuser123
       headers: {
@@ -39,7 +41,7 @@ export default function Home(props) {
       body: JSON.stringify(data),
     });
     console.log("res", res);
-    await location.reload();
+    // await location.reload();
   }
   return (
     <Layout home>
@@ -48,7 +50,7 @@ export default function Home(props) {
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
         <h2 className={utilStyles.headingLg}>My Simple Forum</h2>
         <ul className={utilStyles.list}>
-          {props.posts.map((post) => {
+          {props.posts.map((post,i) => {
             return (
               <li className={utilStyles.listItem} key={post.id}>
                 <Link href="/posts/[id]" as={`/posts/${post.id}`}>
@@ -56,7 +58,7 @@ export default function Home(props) {
                 </Link>
                 <br />
                 <small className={utilStyles.lightText}>
-                #{post.id} {post.owner}．<Date dateString={post.created} />
+                #{i+1} {post.owner}．<Date dateString={post.created} />
                 </small>
               </li>
             );
@@ -86,7 +88,9 @@ export default function Home(props) {
 }
 
 export async function getStaticProps() {
-  const res = await fetch("http://127.0.0.1:8000/posts.json");
+  const res = await fetch("http://34.69.148.251/posts.json");
+  // const res = await fetch("http://localhost:8000/posts.json");
+
   const json = await res.json();
   const posts = await json.results;
 

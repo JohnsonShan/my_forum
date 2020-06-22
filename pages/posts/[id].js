@@ -21,7 +21,9 @@ export default function Post({ post }) {
       post: url,
       // owner: 'Anonymous',
     };
-    const res = await fetch("http://127.0.0.1:8000/comments/", {
+    
+    const res = await fetch("http://34.69.148.251/comments/", {
+      // const res = await fetch("http://localhost:8000/comments/", {
       method: 'post',
       // id Anonymous, pw guestuser123
       headers: {
@@ -54,11 +56,15 @@ export default function Post({ post }) {
           <ul className={utilStyles.list}>
             {post.comments.map((comment, i) => {
               const array = comment.split(", ");
+              let joinArray = '';
+              for(let j=2;j<array.length;j++){
+                joinArray += array[j];
+              }
               return (
                 <li className={utilStyles.listItem} key={i}>
-                  #{i + 1} {array[0]}．<Date dateString={array[2]} />
+                  #{i + 1} {array[0]}．<Date dateString={array[1]} />
                   <br />
-                  {array[1]}
+                  {joinArray}
                 </li>
               );
             })}
@@ -80,7 +86,8 @@ export default function Post({ post }) {
 }
 
 export async function getStaticPaths() {
-  const res = await fetch("http://127.0.0.1:8000/posts.json");
+  const res = await fetch("http://34.69.148.251/posts.json");
+  // const res = await fetch("http://localhost:8000/posts.json");
   const json = await res.json();
   const posts = await json.results;
   const paths = await posts.map((post) => {
@@ -98,7 +105,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const endPoint = "http://127.0.0.1:8000/posts/" + params.id + ".json";
+  const endPoint = "http://34.69.148.251/posts/" + params.id + ".json";
+  // const endPoint = "http://localhost:8000/posts/" + params.id + ".json";
   const res = await fetch(endPoint);
   const post = await res.json();
 
