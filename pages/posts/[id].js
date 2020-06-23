@@ -48,9 +48,9 @@ export default function Post({ post }) {
       <article>
         <h1 className={utilStyles.headingXl}>{post.title}</h1>
         <div className={utilStyles.lightText}>
-          {/* <Date dateString={postData.date} /> */}
         </div>
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        {/* {console.log(post.content.split('\r\n').join('<br />'))} */}
+        <div dangerouslySetInnerHTML={{ __html: post.content.split('\r\n').join('<br />') }} />
         <div>
           <h4>Comment:</h4>
           <ul className={utilStyles.list}>
@@ -58,7 +58,8 @@ export default function Post({ post }) {
               const array = comment.split(", ");
               let joinArray = '';
               for(let j=2;j<array.length;j++){
-                joinArray += array[j];
+                // console.log(array[j].replace('\r\n','<br />'))
+                joinArray += array[j].split('\r\n').join('<br />');
               }
               return (
                 <li className={utilStyles.listItem} key={i}>

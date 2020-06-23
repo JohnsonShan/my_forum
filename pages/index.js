@@ -41,12 +41,12 @@ export default function Home(props) {
       body: JSON.stringify(data),
     });
     console.log("res", res);
-    // await location.reload();
+    await location.reload();
   }
   return (
     <Layout home>
       <Head>…</Head>
-      <section className={utilStyles.headingMd}>…</section>
+      <section className={utilStyles.headingMd}></section>
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
         <h2 className={utilStyles.headingLg}>My Simple Forum</h2>
         <ul className={utilStyles.list}>
