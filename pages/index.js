@@ -50,15 +50,15 @@ export default function Home(props) {
       <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
         <h2 className={utilStyles.headingLg}>My Simple Forum</h2>
         <ul className={utilStyles.list}>
-          {props.posts.map((post,i) => {
+          {props.posts.map((post, i) => {
             return (
               <li className={utilStyles.listItem} key={post.id}>
                 <Link href="/posts/[id]" as={`/posts/${post.id}`}>
-            <a>{post.title}</a>
+                  <a>{post.title}</a>
                 </Link>
                 <br />
                 <small className={utilStyles.lightText}>
-                #{i+1} {post.owner}．<Date dateString={post.created} />
+                  #{i + 1} {post.owner}．<Date dateString={post.created} />
                 </small>
               </li>
             );
@@ -66,7 +66,9 @@ export default function Home(props) {
         </ul>
         <form onSubmit={handleSubmit}>
           <label>Title:</label>
+          <br />
           <input
+            
             type="text"
             value={title}
             onChange={handleTitleChange(setTitle)}
@@ -74,12 +76,15 @@ export default function Home(props) {
           />
           <br />
           <label>Content:</label>
-          <input
+          <br />
+          <textarea
+            
             type="text"
             value={input}
             onChange={handleInputChange(setInput)}
             placeholder="Content"
           />
+          <br />
           <input type="submit" value="Submit" />
         </form>
       </section>

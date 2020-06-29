@@ -11,6 +11,8 @@ export default function Post({ post }) {
     setInput(e.target.value);
   };
 
+  const safeContent = post.content.split('<').join('< ').split('< img').join('<img').split('\r\n').join('<br />');
+
   async function handleSubmit(e) {
     e.preventDefault();
     // console.log(input);
@@ -40,6 +42,7 @@ export default function Post({ post }) {
     console.log("res", res);
     await location.reload();
   }
+
   return (
     <Layout>
       <Head>
@@ -49,23 +52,22 @@ export default function Post({ post }) {
         <h1 className={utilStyles.headingXl}>{post.title}</h1>
         <div className={utilStyles.lightText}>
         </div>
-        {/* {console.log(post.content.split('\r\n').join('<br />'))} */}
-        <div dangerouslySetInnerHTML={{ __html: post.content.split('\r\n').join('<br />') }} />
+        
+        <div dangerouslySetInnerHTML={{ __html: safeContent }} />
         <div>
           <h4>Comment:</h4>
           <ul className={utilStyles.list}>
             {post.comments.map((comment, i) => {
               const array = comment.split(", ");
-              let joinArray = '';
-              for(let j=2;j<array.length;j++){
-                // console.log(array[j].replace('\r\n','<br />'))
-                joinArray += array[j].split('\r\n').join('<br />');
+              let joinArray = array[2].split('<').join('< ').split('< img').join('<img').split('\r\n').join('<br />');
+              for(let j=3;j<array.length;j++){
+                joinArray += ', ' + array[j].split('<').join('< ').split('< img').join('<img').split('\r\n').join('<br />');
               }
               return (
                 <li className={utilStyles.listItem} key={i}>
                   #{i + 1} {array[0]}．<Date dateString={array[1]} />
                   <br />
-                  {joinArray}
+                  <div dangerouslySetInnerHTML={{ __html: joinArray }} />
                 </li>
               );
             })}
@@ -73,7 +75,7 @@ export default function Post({ post }) {
         </div>
         <form onSubmit={handleSubmit}>
           <label>Comment:</label>
-          <input
+          <textarea
             type="text"
             value={input}
             onChange={handleChange(setInput)}
