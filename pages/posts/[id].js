@@ -11,11 +11,17 @@ export default function Post({ post }) {
     setInput(e.target.value);
   };
 
-  const safeContent = post.content.split('<').join('< ').split('< img').join('<img').split('\r\n').join('<br />');
+  const safeContent = post.content.split('<').join('< ').split('< img').join('<img').split('\n').join('<br />');
 
   async function handleSubmit(e) {
     e.preventDefault();
     // console.log(input);
+
+    const csrftoken = document.cookie
+    .split("; ")
+    .find((row) => row.startsWith("csrftoken"))
+    .split("=")[1];
+    
     const url = post.url.replace(".json", "/");
     // console.log(url);
     const data = {
@@ -24,16 +30,17 @@ export default function Post({ post }) {
       // owner: 'Anonymous',
     };
     
-    const res = await fetch("http://34.69.148.251/comments/", {
-      // const res = await fetch("http://localhost:8000/comments/", {
+    // const res = await fetch("http://34.69.148.251/comments/", {
+      const res = await fetch("http://localhost:8000/comments/", {
       method: 'post',
       // id Anonymous, pw guestuser123
       headers: {
         // csrfmiddlewaretoken: '{{ csrf_token }}',
         // 'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'X-Requested-With': 'XMLHttpRequest',
-        'Authorization': 'Basic ' + btoa('Anonymous:guestuser123')
+        // 'X-Requested-With': 'XMLHttpRequest',
+        // 'Authorization': 'Basic ' + btoa('Anonymous:guestuser123')
+        Authorization: "Token " + csrftoken,
       },
       // credentials: 'Anonymous:guestuser123',
       body: JSON.stringify(data),
@@ -89,8 +96,8 @@ export default function Post({ post }) {
 }
 
 export async function getStaticPaths() {
-  const res = await fetch("http://34.69.148.251/posts.json");
-  // const res = await fetch("http://localhost:8000/posts.json");
+  // const res = await fetch("http://34.69.148.251/posts.json");
+  const res = await fetch("http://localhost:8000/posts.json");
   const json = await res.json();
   const posts = await json.results;
   const paths = await posts.map((post) => {
@@ -108,8 +115,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  const endPoint = "http://34.69.148.251/posts/" + params.id + ".json";
-  // const endPoint = "http://localhost:8000/posts/" + params.id + ".json";
+  // const endPoint = "http://34.69.148.251/posts/" + params.id + ".json";
+  const endPoint = "http://localhost:8000/posts/" + params.id + ".json";
   const res = await fetch(endPoint);
   const post = await res.json();
 

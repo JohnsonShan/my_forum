@@ -1,12 +1,76 @@
-import Head from 'next/head'
-import styles from './layout.module.css'
-import utilStyles from '../styles/utils.module.css'
-import Link from 'next/link'
+import Head from "next/head";
+import styles from "./layout.module.css";
+import utilStyles from "../styles/utils.module.css";
+import Link from "next/link";
 
-const name = 'Johnson'
-export const siteTitle = 'Next.js Sample Website'
+import React, { useState, useEffect } from "react";
 
-export default function Layout({ children, home }) {
+export const siteTitle = "Next.js Sample Website";
+
+export default function Layout({ children, home, AuthPage }) {
+  let [username, setUserName] = useState("Anonymous");
+  let [login, setLogin] = useState("false");
+
+  useEffect(() => {
+    const Cookies = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("username"));
+    if (Cookies != undefined) {
+      setUserName(Cookies.split("=")[1]);
+      if(username!='Anonymous'){
+        setLogin(true);
+      } else {
+        setLogin(false);
+      }
+      
+    } else {
+      setUserName("Anonymous");
+      setLogin(false);
+      const data = {
+        username: 'Anonymous',
+        password: 'guestuser123',
+      };
+      // const res = await fetch("http://34.69.148.251/users/", {
+      const res = fetch("http://localhost:8000/api-token-auth/", {
+        // const res = await fetch("http://localhost:8000/users/", {
+        method: "post",
+        // id Anonymous, pw guestuser123
+        headers: {
+          // csrfmiddlewaretoken: '{{ csrf_token }}',
+          // 'Accept': 'application/json',
+          // "X-CSRFToken": csrftoken,
+          "Content-Type": "application/json",
+          // "X-Requested-With": "XMLHttpRequest",
+          // Authorization: "Basic " + btoa("Anonymous:guestuser123"),
+          // Authorization: "Token " + csrftoken,
+        },
+        // credentials: 'Anonymous:guestuser123',
+        body: JSON.stringify(data),
+      }).then((res) => {
+        status = res.status;
+        console.log("status", status);
+        return res.json();
+      })
+      .then((result) => {
+        if (status == 200) {
+          document.cookie = "csrftoken=" + result.token;
+          document.cookie = "username=" + username;
+          // alert("Success");
+          location.href = '/';
+        } else {
+            // alert('Invalid Username/Password.')
+        }
+      });
+    }
+  });
+  function logOut() {
+    var res = document.cookie;
+    var multiple = res.split(";");
+    for (var i = 0; i < multiple.length; i++) {
+      var key = multiple[i].split("=");
+      document.cookie = key[0] + " =; expires = Thu, 01 Jan 1970 00:00:00 UTC";
+    }
+  }
   return (
     <div className={styles.container}>
       <Head>
@@ -30,9 +94,9 @@ export default function Layout({ children, home }) {
             <img
               src="/images/profile.jpg"
               className={`${styles.headerHomeImage} ${utilStyles.borderCircle}`}
-              alt={name}
+              alt={username}
             />
-            <h1 className={utilStyles.heading2Xl}>{name}</h1>
+            <h1 className={utilStyles.heading2Xl}>{username}</h1>
           </>
         ) : (
           <>
@@ -41,18 +105,39 @@ export default function Layout({ children, home }) {
                 <img
                   src="/images/profile.jpg"
                   className={`${styles.headerImage} ${utilStyles.borderCircle}`}
-                  alt={name}
+                  alt={username}
                 />
               </a>
             </Link>
             <h2 className={utilStyles.headingLg}>
               <Link href="/">
-                <a className={utilStyles.colorInherit}>{name}</a>
+                <a className={utilStyles.colorInherit}>{username}</a>
               </Link>
             </h2>
           </>
         )}
       </header>
+
+      {AuthPage ? (
+        <></>
+      ) : login ? (
+        <>
+          <Link href="/">
+            <a onClick={logOut}>Log Out</a>
+          </Link>
+        </>
+      ) : (
+        <>
+          <Link href="/login">
+            <a>Log In</a>
+          </Link>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <Link href="/signup">
+            <a>Sign Up </a>
+          </Link>
+        </>
+      )}
+
       <main>{children}</main>
       {!home && (
         <div className={styles.backToHome}>
@@ -62,5 +147,5 @@ export default function Layout({ children, home }) {
         </div>
       )}
     </div>
-  )
+  );
 }
