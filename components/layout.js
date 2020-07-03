@@ -7,9 +7,12 @@ import React, { useState, useEffect } from "react";
 
 export const siteTitle = "Next.js Sample Website";
 
+const domain = "http://34.70.158.129";
+// const domain = "http://localhost:8000";
+
 export default function Layout({ children, home, AuthPage }) {
   let [username, setUserName] = useState("Anonymous");
-  let [login, setLogin] = useState("false");
+  let [login, setLogin] = useState(false);
 
   useEffect(() => {
     const Cookies = document.cookie
@@ -17,52 +20,23 @@ export default function Layout({ children, home, AuthPage }) {
       .find((row) => row.startsWith("username"));
     if (Cookies != undefined) {
       setUserName(Cookies.split("=")[1]);
-      if(username!='Anonymous'){
+      if (username != "Anonymous") {
         setLogin(true);
       } else {
         setLogin(false);
       }
-      
     } else {
       setUserName("Anonymous");
       setLogin(false);
-      const data = {
-        username: 'Anonymous',
-        password: 'guestuser123',
-      };
-      // const res = await fetch("http://34.69.148.251/users/", {
-      const res = fetch("http://localhost:8000/api-token-auth/", {
-        // const res = await fetch("http://localhost:8000/users/", {
-        method: "post",
-        // id Anonymous, pw guestuser123
-        headers: {
-          // csrfmiddlewaretoken: '{{ csrf_token }}',
-          // 'Accept': 'application/json',
-          // "X-CSRFToken": csrftoken,
-          "Content-Type": "application/json",
-          // "X-Requested-With": "XMLHttpRequest",
-          // Authorization: "Basic " + btoa("Anonymous:guestuser123"),
-          // Authorization: "Token " + csrftoken,
-        },
-        // credentials: 'Anonymous:guestuser123',
-        body: JSON.stringify(data),
-      }).then((res) => {
-        status = res.status;
-        console.log("status", status);
-        return res.json();
-      })
-      .then((result) => {
-        if (status == 200) {
-          document.cookie = "csrftoken=" + result.token;
-          document.cookie = "username=" + username;
-          // alert("Success");
-          location.href = '/';
-        } else {
-            // alert('Invalid Username/Password.')
-        }
-      });
     }
   });
+
+  function guestLogIn() {
+    document.cookie = "csrftoken=" + "eb95839381c7e5af05aa0f117119525a55d76a91";
+    document.cookie = "username=" + "Guest";
+    // location.href = "";
+  }
+
   function logOut() {
     var res = document.cookie;
     var multiple = res.split(";");
@@ -70,7 +44,10 @@ export default function Layout({ children, home, AuthPage }) {
       var key = multiple[i].split("=");
       document.cookie = key[0] + " =; expires = Thu, 01 Jan 1970 00:00:00 UTC";
     }
+    // location.href = "";
+    // location.reload();
   }
+
   return (
     <div className={styles.container}>
       <Head>
@@ -122,7 +99,7 @@ export default function Layout({ children, home, AuthPage }) {
         <></>
       ) : login ? (
         <>
-          <Link href="/">
+          <Link href="">
             <a onClick={logOut}>Log Out</a>
           </Link>
         </>
@@ -135,10 +112,14 @@ export default function Layout({ children, home, AuthPage }) {
           <Link href="/signup">
             <a>Sign Up </a>
           </Link>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <Link href="">
+            <a onClick={guestLogIn}>Quick LogIn</a>
+          </Link>
         </>
       )}
-
       <main>{children}</main>
+
       {!home && (
         <div className={styles.backToHome}>
           <Link href="/">

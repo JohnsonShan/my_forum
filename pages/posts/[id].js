@@ -4,100 +4,76 @@ import Head from "next/head";
 import Date from "../../components/date";
 import utilStyles from "../../styles/utils.module.css";
 import { useState } from "react";
+import UploadComment from "../../components/uploadComment";
+
+const domain = "http://34.70.158.129";
+// const domain = "http://localhost:8000";
 
 export default function Post({ post }) {
-  let [input, setInput] = useState("");
-  const handleChange = (setInput) => (e) => {
-    setInput(e.target.value);
-  };
 
-  const safeContent = post.content.split('<').join('< ').split('< img').join('<img').split('\n').join('<br />');
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    // console.log(input);
+  const safeContent = post.content
+    .split("<")
+    .join("< ")
+    // .split("< img")
+    // .join("<img")
+    .split("\n")
+    .join("<br />");
 
-    const csrftoken = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith("csrftoken"))
-    .split("=")[1];
-    
-    const url = post.url.replace(".json", "/");
-    // console.log(url);
-    const data = {
-      content: input,
-      post: url,
-      // owner: 'Anonymous',
-    };
-    
-    // const res = await fetch("http://34.69.148.251/comments/", {
-      const res = await fetch("http://localhost:8000/comments/", {
-      method: 'post',
-      // id Anonymous, pw guestuser123
-      headers: {
-        // csrfmiddlewaretoken: '{{ csrf_token }}',
-        // 'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        // 'X-Requested-With': 'XMLHttpRequest',
-        // 'Authorization': 'Basic ' + btoa('Anonymous:guestuser123')
-        Authorization: "Token " + csrftoken,
-      },
-      // credentials: 'Anonymous:guestuser123',
-      body: JSON.stringify(data),
-      
-    });
-    console.log("res", res);
-    await location.reload();
-  }
+
 
   return (
     <Layout>
       <Head>
-        <title>{post.title}</title>
+        <title> {post.title} </title>
       </Head>
       <article>
-        <h1 className={utilStyles.headingXl}>{post.title}</h1>
-        <div className={utilStyles.lightText}>
-        </div>
-        
+        <h1 className={utilStyles.headingXl}> {post.title} </h1>
+        <div className={utilStyles.lightText}></div>
         <div dangerouslySetInnerHTML={{ __html: safeContent }} />
         <div>
-          <h4>Comment:</h4>
+          <h4> Comment: </h4>
           <ul className={utilStyles.list}>
+            
             {post.comments.map((comment, i) => {
               const array = comment.split(", ");
-              let joinArray = array[2].split('<').join('< ').split('< img').join('<img').split('\r\n').join('<br />');
-              for(let j=3;j<array.length;j++){
-                joinArray += ', ' + array[j].split('<').join('< ').split('< img').join('<img').split('\r\n').join('<br />');
+              let joinArray = array[2]
+                .split("<")
+                .join("< ")
+                // .split("< img")
+                // .join("<img")
+                .split("\n")
+                .join("<br />");
+              for (let j = 3; j < array.length; j++) {
+                joinArray +=
+                  ", " +
+                  array[j]
+                    .split("<")
+                    .join("< ")
+                    .split("< img")
+                    .join("<img")
+                    .split("\r\n")
+                    .join("<br />");
               }
               return (
                 <li className={utilStyles.listItem} key={i}>
-                  #{i + 1} {array[0]}．<Date dateString={array[1]} />
-                  <br />
-                  <div dangerouslySetInnerHTML={{ __html: joinArray }} />
+                  {" "}
+                  #{i + 1} {array[0]}． <Date dateString={array[1]} /> <br />
+                  <div dangerouslySetInnerHTML={{ __html: joinArray }} />{" "}
                 </li>
               );
             })}
           </ul>
         </div>
-        <form onSubmit={handleSubmit}>
-          <label>Comment:</label>
-          <textarea
-            type="text"
-            value={input}
-            onChange={handleChange(setInput)}
-            placeholder=""
-          />
-          <input type="submit" value="Submit" />
-        </form>
+        <UploadComment props={post.url}/>
       </article>
     </Layout>
   );
 }
 
 export async function getStaticPaths() {
-  // const res = await fetch("http://34.69.148.251/posts.json");
-  const res = await fetch("http://localhost:8000/posts.json");
+  const endPoint = domain + "/posts.json";
+  const res = await fetch(endPoint);
   const json = await res.json();
   const posts = await json.results;
   const paths = await posts.map((post) => {
@@ -116,7 +92,7 @@ export async function getStaticPaths() {
 
 export async function getStaticProps({ params }) {
   // const endPoint = "http://34.69.148.251/posts/" + params.id + ".json";
-  const endPoint = "http://localhost:8000/posts/" + params.id + ".json";
+  const endPoint = domain + "/posts/" + params.id + ".json";
   const res = await fetch(endPoint);
   const post = await res.json();
 

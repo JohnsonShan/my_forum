@@ -4,15 +4,36 @@ import utilStyles from "../styles/utils.module.css";
 import { getSortedPostsData } from "../lib/posts";
 import Link from "next/link";
 import Date from "../components/date";
-import { useState } from "react";
-import UploadPost from "../components/uploadPost.js";
+
+import React, { useState, useEffect } from "react";
 
 const domain = "http://34.70.158.129";
 // const domain = "http://localhost:8000";
 
-export default function Home(props) {
+export default function UploadPost() {
+  let [username, setUserName] = useState("Anonymous");
+
   let [input, setInput] = useState("");
   let [title, setTitle] = useState("");
+
+  let [login, setLogin] = useState(false);
+
+  useEffect(() => {
+    const Cookies = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("username"));
+    if (Cookies != undefined) {
+      setUserName(Cookies.split("=")[1]);
+      if (username != "Anonymous") {
+        setLogin(true);
+      } else {
+        setLogin(false);
+      }
+    } else {
+      setUserName("Anonymous");
+      setLogin(false);
+    }
+  });
 
   const handleTitleChange = (setTitle) => (e) => {
     setTitle(e.target.value);
@@ -33,6 +54,7 @@ export default function Home(props) {
       content: input,
       comments: [],
     };
+
     const endPoint = domain + "/posts/";
     const res = await fetch(endPoint, {
       method: "post",
@@ -47,42 +69,30 @@ export default function Home(props) {
   }
 
   return (
-    <Layout home>
-      <Head>…</Head>
-      <section className={utilStyles.headingMd}></section>
-      <section className={`${utilStyles.headingMd} ${utilStyles.padding1px}`}>
-        <h2 className={utilStyles.headingLg}>My Simple Forum</h2>
-        <ul className={utilStyles.list}>
-          {props.posts.map((post, i) => {
-            return (
-              <li className={utilStyles.listItem} key={post.id}>
-                <Link href="/posts/[id]" as={`/posts/${post.id}`}>
-                  <a>{post.title}</a>
-                </Link>
-                <br />
-                <small className={utilStyles.lightText}>
-                  #{i + 1} {post.owner}．<Date dateString={post.created} />
-                </small>
-              </li>
-            );
-          })}
-        </ul>
-        <UploadPost />
-      </section>
-    </Layout>
+    <div>
+      {login ? (
+        <form onSubmit={handleSubmit}>
+          <label> Title: </label> <br />
+          <input
+            type="text"
+            value={title}
+            onChange={handleTitleChange(setTitle)}
+            placeholder="Title"
+          />
+          <br />
+          <label> Content: </label> <br />
+          <textarea
+            type="text"
+            value={input}
+            onChange={handleInputChange(setInput)}
+            placeholder="Content"
+          />
+          <br />
+          <input type="submit" value="Submit" />
+        </form>
+      ) : (
+        <></>
+      )}
+    </div>
   );
-}
-
-export async function getStaticProps() {
-  const endPoint = domain + "/posts.json";
-
-  const res = await fetch(endPoint);
-  const json = await res.json();
-  const posts = await json.results;
-
-  return {
-    props: {
-      posts,
-    },
-  };
 }

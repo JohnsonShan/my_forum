@@ -6,6 +6,9 @@ import Link from "next/link";
 import Date from "../components/date";
 import { useState } from "react";
 
+const domain = "http://34.70.158.129";
+// const domain = "http://localhost:8000";
+
 export default function SignIn() {
   let [username, setUserName] = useState("");
   let [password, setPassword] = useState("");
@@ -25,10 +28,7 @@ export default function SignIn() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const csrftoken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("csrftoken"))
-      .split("=")[1];
+    const csrftoken = "a3a739bd6fbfd1016e1fe766c6db637030790f2e"
 
     if (password != passwordConfirm) {
       // alert('Invalid Username/Password.');
@@ -43,7 +43,7 @@ export default function SignIn() {
     usernameArray.every((char) => {
       if (validInput.includes(char)) {
       } else {
-        console.log("char", char);
+        // console.log("char", char);
         validBoolean = false;
       }
     });
@@ -58,28 +58,21 @@ export default function SignIn() {
       username: username,
       password: password,
     };
-    // const res = await fetch("http://34.69.148.251/users/", {
-    // const res = await fetch("http://localhost:8000/api-token-auth/", {
-    const res = await fetch("http://localhost:8000/users/", {
+
+    const endPoint = domain + "/users/";
+    const res = await fetch(endPoint, {
       method: "post",
-      // id Anonymous, pw guestuser123
       headers: {
-        // csrfmiddlewaretoken: '{{ csrf_token }}',
-        // 'Accept': 'application/json',
-        // "X-CSRFToken": csrftoken,
         "Content-Type": "application/json",
-        // "X-Requested-With": "XMLHttpRequest",
-        // Authorization: "Basic " + btoa("Anonymous:guestuser123"),
         Authorization: "Token " + csrftoken,
       },
-      // credentials: 'Anonymous:guestuser123',
       body: JSON.stringify(data),
     }).then((res) => {
       status = res.status;
       //   console.log("status", status);
       if (status == 201) {
         alert("Success");
-        location.href = "/";
+        location.href = "/login";
       } else {
         alert("Unsuccess, Invalid Username or Username already exist.");
       }
@@ -108,12 +101,12 @@ export default function SignIn() {
           placeholder="password"
         />
         <br />
-        <label> Confirm: </label> <br />
+        <label> Password (again): </label> <br />
         <input
           type="password"
           value={passwordConfirm}
           onChange={handlePasswordConfirmChange(setPasswordConfirm)}
-          placeholder="Confirm"
+          placeholder="Password (again)"
         />
         <br />
         <input type="submit" value="Submit" />

@@ -6,6 +6,10 @@ import Link from "next/link";
 import Date from "../components/date";
 import { useState } from "react";
 
+
+const domain = "http://34.70.158.129";
+// const domain = "http://localhost:8000";
+
 export default function SignIn() {
   let [username, setUserName] = useState("");
   let [password, setPassword] = useState("");
@@ -21,37 +25,22 @@ export default function SignIn() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    // const Cookies = document.cookie
-    //   .split("; ")
-    //   .find((row) => row.startsWith("csrftoken"))
-    //   .split("=")[1];
-
-    // console.log("cookie", Cookies);
-
     const data = {
       username: username,
       password: password,
     };
-    // const res = await fetch("http://34.69.148.251/users/", {
-    const res = await fetch("http://localhost:8000/api-token-auth/", {
-      // const res = await fetch("http://localhost:8000/users/", {
+    const endPoint = domain + "/api-token-auth/";
+
+    const res = await fetch(endPoint, {
       method: "post",
-      // id Anonymous, pw guestuser123
       headers: {
-        // csrfmiddlewaretoken: '{{ csrf_token }}',
-        // 'Accept': 'application/json',
-        // "X-CSRFToken": csrftoken,
         "Content-Type": "application/json",
-        // "X-Requested-With": "XMLHttpRequest",
-        // Authorization: "Basic " + btoa("Anonymous:guestuser123"),
-        // Authorization: "Token " + csrftoken,
       },
-      // credentials: 'Anonymous:guestuser123',
       body: JSON.stringify(data),
     })
       .then((res) => {
         status = res.status;
-        console.log("status", status);
+        // console.log("status", status);
         return res.json();
       })
       .then((result) => {
@@ -59,18 +48,17 @@ export default function SignIn() {
           document.cookie = "csrftoken=" + result.token;
           document.cookie = "username=" + username;
           alert("Success");
-          location.href = '/';
+          location.href = "/";
         } else {
-            alert('Invalid Username/Password.')
+          alert("Invalid Username/Password.");
         }
       });
-    
   }
 
   return (
     <Layout AuthPage>
       <Head>
-        <title> Log In </title>
+        <title> Log In </title>{" "}
       </Head>{" "}
       <form onSubmit={handleSubmit}>
         <label> Username: </label> <br />
@@ -91,7 +79,6 @@ export default function SignIn() {
         <br />
         <input type="submit" value="Submit" />
       </form>
-
     </Layout>
   );
 }
