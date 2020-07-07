@@ -13,11 +13,13 @@ const domain = "http://34.70.158.129";
 export default function Layout({ children, home, AuthPage }) {
   let [username, setUserName] = useState("Anonymous");
   let [login, setLogin] = useState(false);
-
+  let [curPath, setCurPath] = useState("/");
+  //<Link href="/posts/[id]" as={`/posts/${post.id}`}>
   useEffect(() => {
     const Cookies = document.cookie
       .split("; ")
       .find((row) => row.startsWith("username"));
+
     if (Cookies != undefined) {
       setUserName(Cookies.split("=")[1]);
       if (username != "Anonymous") {
@@ -29,6 +31,14 @@ export default function Layout({ children, home, AuthPage }) {
       setUserName("Anonymous");
       setLogin(false);
     }
+
+    setCurPath(
+      location.href
+        .replace("http://localhost", "")
+        .replace("http://34.70.158.129", "")
+    );
+    // console.log(curPath);
+    
   });
 
   function guestLogIn() {
@@ -52,10 +62,6 @@ export default function Layout({ children, home, AuthPage }) {
     <div className={styles.container}>
       <Head>
         <link rel="icon" href="/favicon.ico" />
-        <meta
-          name="description"
-          content="Learn how to build a personal website using Next.js"
-        />
         <meta
           property="og:image"
           content={`https://og-image.now.sh/${encodeURI(
@@ -98,9 +104,31 @@ export default function Layout({ children, home, AuthPage }) {
       {AuthPage ? (
         <></>
       ) : login ? (
+        home ? (
+          <>
+            <Link href="/">
+              <a onClick={logOut}>Log Out</a>
+            </Link>
+          </>
+        ) : (
+          <>
+            <Link href="/posts/[id]" as={curPath}>
+              <a onClick={logOut}>Log Out</a>
+            </Link>
+          </>
+        )
+      ) : home ? (
         <>
-          <Link href="">
-            <a onClick={logOut}>Log Out</a>
+          <Link href="/login">
+            <a>Log In</a>
+          </Link>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <Link href="/signup">
+            <a>Sign Up </a>
+          </Link>
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <Link href="/">
+            <a onClick={guestLogIn}>Quick LogIn</a>
           </Link>
         </>
       ) : (
@@ -113,7 +141,7 @@ export default function Layout({ children, home, AuthPage }) {
             <a>Sign Up </a>
           </Link>
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <Link href="">
+          <Link href="/posts/[id]" as={curPath}>
             <a onClick={guestLogIn}>Quick LogIn</a>
           </Link>
         </>

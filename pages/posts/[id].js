@@ -50,8 +50,8 @@ export default function Post({ post }) {
                   array[j]
                     .split("<")
                     .join("< ")
-                    .split("< img")
-                    .join("<img")
+                    // .split("< img")
+                    // .join("<img")
                     .split("\r\n")
                     .join("<br />");
               }
@@ -91,7 +91,6 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps({ params }) {
-  // const endPoint = "http://34.69.148.251/posts/" + params.id + ".json";
   const endPoint = domain + "/posts/" + params.id + ".json";
   const res = await fetch(endPoint);
   const post = await res.json();
